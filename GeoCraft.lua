@@ -1,4 +1,4 @@
--- CatalystWorld.lua
+-- GeoCraft.lua
 -- This script will be the main entry point for the plugin
 -- It will create the UI and handle the main logic
 
