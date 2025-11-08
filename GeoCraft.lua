@@ -5,157 +5,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AssetService = game:GetService("AssetService")
 
--- [[ ENHANCED THEME & STYLING ]] --
--- Modern Glassmorphism Theme with Gradient Effects and Premium Aesthetics
-local Theme = {
-	-- Main Colors with Gradient Support
-	Background = Color3.fromRGB(25, 25, 30),        -- Deep dark base
-	BackgroundGradient = Color3.fromRGB(35, 35, 40), -- Gradient end
-
-	local function createLoadingSpinner(parent, size)
-		local container = Instance.new("Frame")
-		container.Size = UDim2.new(0, size or Responsive.getSizes().spinnerSize, 0, size or Responsive.getSizes().spinnerSize)
-		container.BackgroundTransparency = 1
-		container.Parent = parent
-
-		local spinner = Instance.new("Frame")
-		spinner.Size = UDim2.new(1, 0, 1, 0)
-		spinner.BackgroundTransparency = 1
-		spinner.Parent = container
-
-		-- Create spinner segments
-		local segments = {}
-		for i = 1, 8 do
-			local segment = Instance.new("Frame")
-			segment.Size = UDim2.new(0.15, 0, 0.15, 0)
-			segment.Position = UDim2.new(0.5, 0, 0.1, 0)
-			segment.AnchorPoint = Vector2.new(0.5, 0.5)
-			segment.BackgroundColor3 = Theme.Primary
-			segment.BackgroundTransparency = 1 - (i / 8)
-			segment.BorderSizePixel = 0
-			segment.Parent = spinner
-
-			local rotation = i * 45
-			local angle = math.rad(rotation)
-			local radius = (size or Responsive.getSizes().spinnerSize) * 0.35
-			segment.Position = UDim2.new(0.5 + math.sin(angle) * 0.35, 0, 0.5 - math.cos(angle) * 0.35, 0)
-			segment.Rotation = rotation
-
-			table.insert(segments, segment)
-		end
-
-		-- Animate rotation
-		local function startSpinAnimation()
-			local spinTween = TweenService:Create(spinner, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1), {
-				Rotation = 360
-			})
-			spinTween:Play()
-			return spinTween
-		end
-
-		-- Animate segment opacity
-		local function startSegmentAnimation()
-			for i, segment in ipairs(segments) do
-				local delay = (i - 1) * 0.1
-				local function animateSegment()
-					local fadeTween = TweenService:Create(segment, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-						BackgroundTransparency = 0.8
-					})
-					fadeTween:Play()
-					fadeTween.Completed:Connect(function()
-						local showTween = TweenService:Create(segment, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-							BackgroundTransparency = 0.2
-						})
-						showTween:Play()
-					end)
-				end
-
-				-- Start animation with delay
-				local connection
-				connection = game:GetService("RunService").Heartbeat:Connect(function()
-					connection:Disconnect()
-					animateSegment()
-				end)
-			end
-		end
-
-		local spinTween = startSpinAnimation()
-		startSegmentAnimation()
-
-		local function show()
-			container.Visible = true
-		end
-
-		local function hide()
-			container.Visible = false
-			if spinTween then
-				spinTween:Cancel()
-			end
-		end
-
-		return show, hide
-	end color
-	ContentBackground = Color3.fromRGB(40, 40, 45), -- Glassmorphism base
-	ContentBackgroundAlpha = 0.85,                    -- Transparency for glass effect
-	HeaderBackground = Color3.fromRGB(30, 30, 35),   -- Header with subtle gradient
-	HeaderGradient = Color3.fromRGB(45, 45, 50),     -- Header gradient end
-	InputBackground = Color3.fromRGB(20, 20, 25),    -- Deep input fields
-	InputBackgroundHover = Color3.fromRGB(28, 28, 33),-- Input hover state
-	DefaultButton = Color3.fromRGB(55, 55, 60),    -- Modern button base
-	ButtonHover = Color3.fromRGB(70, 70, 75),       -- Button hover state
-	ButtonPressed = Color3.fromRGB(45, 45, 50),     -- Button pressed state
-
-	-- Text Colors with Better Hierarchy
-	Text = Color3.fromRGB(240, 240, 245),           -- Primary text - bright
-	TextLight = Color3.fromRGB(255, 255, 255),       -- Headers and important text
-	TextMuted = Color3.fromRGB(140, 140, 150),       -- Secondary text
-	TextDisabled = Color3.fromRGB(100, 100, 110),    -- Disabled text
-	TextAccent = Color3.fromRGB(100, 180, 255),      -- Accent text
-
-	-- Enhanced Accent Colors
-	Primary = Color3.fromRGB(0, 150, 255),          -- Vibrant blue
-	PrimaryGradient = Color3.fromRGB(100, 200, 255), -- Blue gradient
-	Success = Color3.fromRGB(50, 205, 50),           -- Fresh green
-	SuccessGradient = Color3.fromRGB(100, 255, 100), -- Green gradient
-	Danger = Color3.fromRGB(255, 80, 80),            -- Vibrant red
-	DangerGradient = Color3.fromRGB(255, 120, 120),  -- Red gradient
-	Warning = Color3.fromRGB(255, 180, 60),          -- Warm orange
-	WarningGradient = Color3.fromRGB(255, 200, 100), -- Orange gradient
-	Selected = Color3.fromRGB(80, 170, 255),         -- Selection highlight
-
-	-- Special Effects
-	GlowColor = Color3.fromRGB(100, 180, 255),       -- Glow effect color
-	BorderColor = Color3.fromRGB(60, 60, 70),        -- Subtle borders
-	BorderHighlight = Color3.fromRGB(120, 120, 130),-- Highlighted borders
-	ShadowColor = Color3.fromRGB(0, 0, 0),            -- Shadow base
-
-	-- Typography Hierarchy
-	Font = Enum.Font.SourceSans,
-	FontBold = Enum.Font.SourceSansBold,
-	FontLight = Enum.Font.SourceSansLight,
-	HeaderFontSize = 24,
-	TitleFontSize = 18,
-	BodyFontSize = 14,
-	SmallFontSize = 12,
-
-	-- Modern UI Properties
-	CornerRadius = UDim.new(0, Responsive.getSizes().cornerRadius),                    -- Larger radius for modern feel
-	LargeCornerRadius = UDim.new(0, Responsive.getSizes().largeCornerRadius),              -- For cards and containers
-	SmallCornerRadius = UDim.new(0, Responsive.getSizes().smallCornerRadius),               -- For small elements
-
-	-- Animation Settings
-	AnimationSpeed = 0.2,                             -- Smooth animations
-	HoverAnimationSpeed = 0.15,                        -- Quick hover responses
-
-	-- Spacing System
-	PaddingSmall = UDim.new(0, Responsive.getSizes().paddingSmall),
-	PaddingMedium = UDim.new(0, Responsive.getSizes().paddingMedium),
-	PaddingLarge = UDim.new(0, Responsive.getSizes().paddingLarge),
-	MarginSmall = UDim.new(0, Responsive.getSizes().marginSmall),
-	MarginMedium = UDim.new(0, Responsive.getSizes().marginMedium),
-	MarginLarge = UDim.new(0, Responsive.getSizes().marginLarge),
-}
--- [[ END THEME ]] --
+local TweenService = game:GetService("TweenService")
 
 -- [[ RESPONSIVE LAYOUT SYSTEM ]] --
 
@@ -182,6 +32,7 @@ function Responsive.getSizes()
 	local sizes = {
 		-- Header heights
 		headerHeight = isSmall and 150 or isMedium and 180 or 200,
+		headerGlassHeight = isSmall and 60 or isMedium and 70 or 80,
 
 		-- Content heights
 		contentHeight = isSmall and 0.6 or isMedium and 0.65 or 0.7,
@@ -189,24 +40,77 @@ function Responsive.getSizes()
 		-- Action bar heights
 		actionBarHeight = isSmall and 40 or 50,
 
-		-- Card padding
+		-- Card properties
+		cardHeight = isSmall and 200 or 220,
+		cardHeaderHeight = isSmall and 30 or 35,
 		cardPadding = isSmall and 12 or isMedium and 16 or 20,
+		headerPadding = isSmall and 10 or 12,
 
 		-- Text sizes
 		headerFontSize = isSmall and 20 or isMedium and 22 or 24,
 		titleFontSize = isSmall and 14 or isMedium and 16 or 18,
 		bodyFontSize = isSmall and 12 or isMedium and 13 or 14,
 		smallFontSize = isSmall and 10 or 11,
+		biomeCardTextSize = isSmall and 12 or 14,
+		presetManagerButtonTextSize = isSmall and 10 or 12,
 
-		-- Spacing
+		-- Spacing & Corner Radius
 		paddingSmall = isSmall and 4 or isMedium and 6 or 8,
 		paddingMedium = isSmall and 6 or isMedium and 8 or 12,
 		paddingLarge = isSmall and 10 or isMedium and 14 or 18,
+		cornerRadius = isSmall and 6 or 8,
+		largeCornerRadius = isSmall and 10 or 12,
+		smallCornerRadius = isSmall and 3 or 4,
+		listPadding = isSmall and 2 or 4,
+		layoutPadding = isSmall and 4 or 5,
+		gridCellPadding = isSmall and 6 or 8,
+		contentPadding = isSmall and 8 or 10,
+
+		-- Effects
+		shadowOffset = isSmall and 2 or 3,
+		textShadowOffset = 1,
 
 		-- Component sizes
 		buttonHeight = isSmall and 32 or isMedium and 40 or 44,
-		inputHeight = isSmall and 24 or isMedium and 28 or 30,
+		inputHeight = isSmall and 30 or isMedium and 34 or 38,
 		sliderHeight = isSmall and 40 or isMedium and 50 or 60,
+		labelHeight = isSmall and 16 or 18,
+		inputRowHeight = isSmall and 24 or 28,
+		knobSize = isSmall and 16 or 20,
+		sliderKnobSize = isSmall and 18 or 22,
+		segmentedControlHeight = isSmall and 28 or 32,
+		checkboxHeight = isSmall and 24 or 28,
+		switchWidth = isSmall and 40 or 50,
+		switchHeight = isSmall and 20 or 24,
+		switchKnobSize = isSmall and 16 or 20,
+		knobOffset = 2,
+		dropdownHeight = isSmall and 30 or 34,
+		dropdownListHeight = isSmall and 100 or 120,
+		dropdownItemHeight = isSmall and 28 or 32,
+		progressBarHeight = isSmall and 20 or 24,
+		spinnerSize = isSmall and 20 or 24,
+		scrollBarThickness = isSmall and 4 or 6,
+
+		-- Container sizes
+		dropdownContainerHeight = isSmall and 100 or 120,
+		sectionHeaderLabelHeight = isSmall and 20 or 24,
+		biomeCardContainerHeight = isSmall and 100 or 120,
+		biomeCardWidth = isSmall and 80 or 100,
+		biomeCardHeight = isSmall and 60 or 80,
+		presetManagerHeight = isSmall and 150 or 180,
+		presetManagerSaveFrameHeight = isSmall and 30 or 34,
+		presetManagerItemHeight = isSmall and 28 or 32,
+		materialCheckboxesContainerHeight = isSmall and 80 or 100,
+		checkboxesContainerHeight = isSmall and 60 or 80,
+		sectionHeaderHeight = isSmall and 28 or 32,
+		separatorLineHeight = 1,
+		validationLabelHeight = 14,
+		validationLabelOffset = 2,
+
+		-- Tab Bar
+		buttonOffset = isSmall and 4 or 5,
+		tabIconSize = isSmall and 16 or 20,
+		tabTextHeight = isSmall and 16 or 18,
 
 		-- Layout direction
 		isPortrait = height > width,
@@ -247,47 +151,96 @@ function Responsive.getCornerRadius(size)
 	elseif size == "large" then
 		return UDim.new(0, sizes.isSmall and 6 or sizes.isMedium and 8 or 12)
 	end
-	return UDim.new(0, Responsive.getSizes().spacingSmall)
+	return UDim.new(0, Responsive.getSizes().paddingSmall)
 end
 
 -- [[ END RESPONSIVE LAYOUT SYSTEM ]] --
 
+-- [[ ENHANCED THEME & STYLING ]] --
+-- Modern Glassmorphism Theme with Gradient Effects and Premium Aesthetics
+local Theme = {
+	-- Main Colors with Gradient Support
+	Background = Color3.fromRGB(25, 25, 30),        -- Deep dark base
+	BackgroundGradient = Color3.fromRGB(35, 35, 40), -- Gradient end
+	ContentBackground = Color3.fromRGB(40, 40, 45), -- Glassmorphism base
+	ContentBackgroundAlpha = 0.85,                    -- Transparency for glass effect
+	HeaderBackground = Color3.fromRGB(30, 30, 35),   -- Header with subtle gradient
+	HeaderGradient = Color3.fromRGB(45, 45, 50),     -- Header gradient end
+	InputBackground = Color3.fromRGB(20, 20, 25),    -- Deep input fields
+	InputBackgroundHover = Color3.fromRGB(28, 28, 33),-- Input hover state
+	DefaultButton = Color3.fromRGB(55, 55, 60),    -- Modern button base
+	ButtonHover = Color3.fromRGB(70, 70, 75),       -- Button hover state
+	ButtonPressed = Color3.fromRGB(45, 45, 50),     -- Button pressed state
+
+	-- Text Colors with Better Hierarchy
+	Text = Color3.fromRGB(240, 240, 245),           -- Primary text - bright
+	TextLight = Color3.fromRGB(255, 255, 255),       -- Headers and important text
+	TextMuted = Color3.fromRGB(140, 140, 150),       -- Secondary text
+	TextDisabled = Color3.fromRGB(100, 100, 110),    -- Disabled text
+	TextAccent = Color3.fromRGB(100, 180, 255),      -- Accent text
+
+	-- Enhanced Accent Colors
+	Primary = Color3.fromRGB(0, 150, 255),          -- Vibrant blue
+	PrimaryGradient = Color3.fromRGB(100, 200, 255), -- Blue gradient
+	Success = Color3.fromRGB(50, 205, 50),           -- Fresh green
+	SuccessGradient = Color3.fromRGB(100, 255, 100), -- Green gradient
+	Danger = Color3.fromRGB(255, 80, 80),            -- Vibrant red
+	DangerGradient = Color3.fromRGB(255, 120, 120),  -- Red gradient
+	Warning = Color3.fromRGB(255, 180, 60),          -- Warm orange
+	WarningGradient = Color3.fromRGB(255, 200, 100), -- Orange gradient
+	Selected = Color3.fromRGB(80, 170, 255),         -- Selection highlight
+
+	-- Gradients & Glows for Buttons
+	PrimaryGradientStart = Color3.fromRGB(0, 150, 255),
+	PrimaryGradientEnd = Color3.fromRGB(80, 180, 255),
+	PrimaryGlow = Color3.fromRGB(0, 150, 255),
+	SuccessGradientStart = Color3.fromRGB(50, 205, 50),
+	SuccessGradientEnd = Color3.fromRGB(100, 230, 100),
+	SuccessGlow = Color3.fromRGB(50, 205, 50),
+	DangerGradientStart = Color3.fromRGB(255, 80, 80),
+	DangerGradientEnd = Color3.fromRGB(255, 120, 120),
+	DangerGlow = Color3.fromRGB(255, 80, 80),
+	DefaultGradientStart = Color3.fromRGB(55, 55, 60),
+	DefaultGradientEnd = Color3.fromRGB(75, 75, 80),
+	DefaultGlow = Color3.fromRGB(80, 80, 85),
+
+	-- Special Effects
+	GlowColor = Color3.fromRGB(100, 180, 255),       -- Glow effect color
+	BorderColor = Color3.fromRGB(60, 60, 70),        -- Subtle borders
+	BorderHighlight = Color3.fromRGB(120, 120, 130),-- Highlighted borders
+	ShadowColor = Color3.fromRGB(0, 0, 0),            -- Shadow base
+
+	-- Typography Hierarchy
+	Font = Enum.Font.SourceSans,
+	FontBold = Enum.Font.SourceSansBold,
+	FontLight = Enum.Font.SourceSansLight,
+	HeaderFontSize = 24,
+	TitleFontSize = 18,
+	BodyFontSize = 14,
+	SmallFontSize = 12,
+
+	-- Modern UI Properties
+	CornerRadius = UDim.new(0, Responsive.getSizes().cornerRadius),                    -- Larger radius for modern feel
+	LargeCornerRadius = UDim.new(0, Responsive.getSizes().largeCornerRadius),              -- For cards and containers
+	MediumCornerRadius = UDim.new(0, 6),
+	SmallCornerRadius = UDim.new(0, Responsive.getSizes().smallCornerRadius),               -- For small elements
+
+	-- Animation Settings
+	AnimationSpeed = 0.2,                             -- Smooth animations
+	HoverAnimationSpeed = 0.15,                        -- Quick hover responses
+	TabAnimationSpeed = 0.2,
+
+	-- Spacing System
+	PaddingSmall = UDim.new(0, Responsive.getSizes().paddingSmall),
+	PaddingMedium = UDim.new(0, Responsive.getSizes().paddingMedium),
+	PaddingLarge = UDim.new(0, Responsive.getSizes().paddingLarge),
+	MarginSmall = UDim.new(0, 8), -- Placeholder, can be responsive
+	MarginMedium = UDim.new(0, 12), -- Placeholder, can be responsive
+	MarginLarge = UDim.new(0, 16), -- Placeholder, can be responsive
+}
+-- [[ END THEME ]] --
+
 -- [[ RESPONSIVE UPDATE FUNCTIONS ]] --
-
-local function updateResponsiveLayout()
-	local sizes = Responsive.getSizes()
-
-	-- Update header frame
-	headerFrame.Size = UDim2.new(1, 0, 0, sizes.headerHeight)
-
-	-- Update tab frame
-	tabFrame.Size = UDim2.new(1, -sizes.paddingLarge * 2, 0, sizes.buttonHeight)
-	tabFrame.Position = UDim2.new(0, sizes.paddingLarge, 0, sizes.headerHeight + sizes.paddingMedium)
-
-	-- Update content container
-	contentContainer.Size = UDim2.new(1, -sizes.paddingLarge * 2, sizes.contentHeight, -sizes.headerHeight - sizes.actionBarHeight - (sizes.paddingMedium * 3))
-	contentContainer.Position = UDim2.new(0, sizes.paddingLarge, 0, sizes.headerHeight + sizes.buttonHeight + (sizes.paddingMedium * 2))
-
-	-- Update action bar
-	actionBarFrame.Size = UDim2.new(1, -sizes.paddingLarge * 2, 0, sizes.actionBarHeight)
-	actionBarFrame.Position = UDim2.new(0, sizes.paddingLarge, 1, -sizes.actionBarHeight - sizes.paddingMedium)
-
-	-- Update preview frame
-	previewFrame.Size = UDim2.new(1, -sizes.paddingLarge * 2, 1, -sizes.buttonHeight - sizes.paddingSmall)
-	previewFrame.Position = UDim2.new(0, sizes.paddingLarge, 0, sizes.buttonHeight)
-
-	-- Update tab layout padding
-	tabLayout.Padding = UDim.new(0, sizes.paddingSmall)
-
-	-- Update action bar layout padding
-	actionBarLayout.Padding = UDim.new(0, sizes.paddingMedium)
-
-	-- Update title font size
-	titleLabel.TextSize = sizes.headerFontSize
-
-	-- Update preview corner radius
-	previewCorner.CornerRadius = Responsive.getCornerRadius("large")
-end
 
 -- [[ END RESPONSIVE UPDATE FUNCTIONS ]] --
 
@@ -436,11 +389,9 @@ local function createModernButton(parent, text, style)
 	textShadow.Parent = button
 
 	-- Animation functions
-	local tweenService = game:GetService("TweenService")
-
 	local function animateMultiple(objects, properties, speed)
 		for _, obj in pairs(objects) do
-			tweenService:Create(obj, TweenInfo.new(speed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), properties):Play()
+			TweenService:Create(obj, TweenInfo.new(speed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), properties):Play()
 		end
 	end
 
@@ -457,7 +408,7 @@ local function createModernButton(parent, text, style)
 		}, Theme.HoverAnimationSpeed)
 
 		-- Scale effect
-		tweenService:Create(gradientFrame, TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		TweenService:Create(gradientFrame, TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = UDim2.new(1.02, 0, 1.02, 0),
 			Position = UDim2.new(-0.01, 0, -0.01, 0)
 		}):Play()
@@ -475,7 +426,7 @@ local function createModernButton(parent, text, style)
 		}, Theme.HoverAnimationSpeed)
 
 		-- Reset scale
-		tweenService:Create(gradientFrame, TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		TweenService:Create(gradientFrame, TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0)
 		}):Play()
@@ -487,7 +438,7 @@ local function createModernButton(parent, text, style)
 		}, 0.1)
 
 		-- Pressed scale effect
-		tweenService:Create(gradientFrame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		TweenService:Create(gradientFrame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = UDim2.new(0.98, 0, 0.98, 0),
 			Position = UDim2.new(0.01, 0, 0.01, 0)
 		}):Play()
@@ -499,7 +450,7 @@ local function createModernButton(parent, text, style)
 		}, Theme.HoverAnimationSpeed)
 
 		-- Release scale effect
-		tweenService:Create(gradientFrame, TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		TweenService:Create(gradientFrame, TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = UDim2.new(1.02, 0, 1.02, 0),
 			Position = UDim2.new(-0.01, 0, -0.01, 0)
 		}):Play()
@@ -507,6 +458,7 @@ local function createModernButton(parent, text, style)
 
 	return button
 end
+
 
 -- Create modern card container
 local function createCard(parent, title)
@@ -557,6 +509,90 @@ local function createCard(parent, title)
 end
 
 -- [[ END MODERN UI HELPERS ]] --
+-- Function to create a loading spinner, moved from Theme table
+local function createLoadingSpinner(parent, size, Theme, Responsive)
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(0, size or Responsive.getSizes().spinnerSize, 0, size or Responsive.getSizes().spinnerSize)
+	container.BackgroundTransparency = 1
+	container.Parent = parent
+
+	local spinner = Instance.new("Frame")
+	spinner.Size = UDim2.new(1, 0, 1, 0)
+	spinner.BackgroundTransparency = 1
+	spinner.Parent = container
+
+	-- Create spinner segments
+	local segments = {}
+	for i = 1, 8 do
+		local segment = Instance.new("Frame")
+		segment.Size = UDim2.new(0.15, 0, 0.15, 0)
+		segment.Position = UDim2.new(0.5, 0, 0.1, 0)
+		segment.AnchorPoint = Vector2.new(0.5, 0.5)
+		segment.BackgroundColor3 = Theme.Primary
+		segment.BackgroundTransparency = 1 - (i / 8)
+		segment.BorderSizePixel = 0
+		segment.Parent = spinner
+
+		local rotation = i * 45
+		local angle = math.rad(rotation)
+		local radius = (size or Responsive.getSizes().spinnerSize) * 0.35
+		segment.Position = UDim2.new(0.5 + math.sin(angle) * 0.35, 0, 0.5 - math.cos(angle) * 0.35, 0)
+		segment.Rotation = rotation
+
+		table.insert(segments, segment)
+	end
+
+	-- Animate rotation
+	local function startSpinAnimation()
+		local spinTween = TweenService:Create(spinner, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1), {
+			Rotation = 360
+		})
+		spinTween:Play()
+		return spinTween
+	end
+
+	-- Animate segment opacity
+	local function startSegmentAnimation()
+		for i, segment in ipairs(segments) do
+			local delay = (i - 1) * 0.1
+			local function animateSegment()
+				local fadeTween = TweenService:Create(segment, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+					BackgroundTransparency = 0.8
+				})
+				fadeTween:Play()
+				fadeTween.Completed:Connect(function()
+					local showTween = TweenService:Create(segment, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+						BackgroundTransparency = 0.2
+					})
+					showTween:Play()
+				end)
+			end
+
+			-- Start animation with delay
+			local connection
+			connection = game:GetService("RunService").Heartbeat:Connect(function()
+				connection:Disconnect()
+				animateSegment()
+			end)
+		end
+	end
+
+	local spinTween = startSpinAnimation()
+	startSegmentAnimation()
+
+	local function show()
+		container.Visible = true
+	end
+
+	local function hide()
+		container.Visible = false
+		if spinTween then
+			spinTween:Cancel()
+		end
+	end
+
+	return show, hide
+end
 
 -- Create the main plugin widget
 local dockWidget = plugin:CreateDockWidgetPluginGui(
@@ -700,6 +736,41 @@ previewTerrainPart.Color = Color3.fromRGB(80, 80, 80)
 previewTerrainPart.Material = Enum.Material.Plastic
 previewTerrainPart.Parent = previewWorldModel
 
+local function updateResponsiveLayout()
+	local sizes = Responsive.getSizes()
+
+	-- Update header frame
+	headerFrame.Size = UDim2.new(1, 0, 0, sizes.headerHeight)
+
+	-- Update tab frame
+	tabFrame.Size = UDim2.new(1, -sizes.paddingLarge * 2, 0, sizes.buttonHeight)
+	tabFrame.Position = UDim2.new(0, sizes.paddingLarge, 0, sizes.headerHeight + sizes.paddingMedium)
+
+	-- Update content container
+	contentContainer.Size = UDim2.new(1, -sizes.paddingLarge * 2, sizes.contentHeight, -sizes.headerHeight - sizes.actionBarHeight - (sizes.paddingMedium * 3))
+	contentContainer.Position = UDim2.new(0, sizes.paddingLarge, 0, sizes.headerHeight + sizes.buttonHeight + (sizes.paddingMedium * 2))
+
+	-- Update action bar
+	actionBarFrame.Size = UDim2.new(1, -sizes.paddingLarge * 2, 0, sizes.actionBarHeight)
+	actionBarFrame.Position = UDim2.new(0, sizes.paddingLarge, 1, -sizes.actionBarHeight - sizes.paddingMedium)
+
+	-- Update preview frame
+	previewFrame.Size = UDim2.new(1, -sizes.paddingLarge * 2, 1, -sizes.buttonHeight - sizes.paddingSmall)
+	previewFrame.Position = UDim2.new(0, sizes.paddingLarge, 0, sizes.buttonHeight)
+
+	-- Update tab layout padding
+	tabLayout.Padding = UDim.new(0, sizes.paddingSmall)
+
+	-- Update action bar layout padding
+	actionBarLayout.Padding = UDim.new(0, sizes.paddingMedium)
+
+	-- Update title font size
+	titleLabel.TextSize = sizes.headerFontSize
+
+	-- Update preview corner radius
+	previewCorner.CornerRadius = Responsive.getCornerRadius("large")
+end
+
 -- Add screen size change listener for responsive layout
 local function setupResponsiveLayout()
 	-- Initial layout update
@@ -836,7 +907,6 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 	local value = default
 	local setValue
 	local dragging = false
-	local tweenService = game:GetService("TweenService")
 
 	local function updateVisuals(percentage)
 		fill.Size = UDim2.new(percentage, 0, 1, 0)
@@ -844,8 +914,8 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 		knobShadow.Position = UDim2.new(percentage, -10, 0.5, -10)
 
 		-- Smooth animation for knob
-		tweenService:Create(knob, TweenInfo.new(0.1), {Position = UDim2.new(percentage, -8, 0.5, -8)}):Play()
-		tweenService:Create(knobShadow, TweenInfo.new(0.1), {Position = UDim2.new(percentage, -10, 0.5, -10)}):Play()
+		TweenService:Create(knob, TweenInfo.new(0.1), {Position = UDim2.new(percentage, -8, 0.5, -8)}):Play()
+		TweenService:Create(knobShadow, TweenInfo.new(0.1), {Position = UDim2.new(percentage, -10, 0.5, -10)}):Play()
 	end
 
 	-- Enhanced input handling with smooth animations
@@ -853,11 +923,11 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			-- Animate to active state
-			tweenService:Create(sliderStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+			TweenService:Create(sliderStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 				Color = Theme.Primary,
 				Transparency = 0.2
 			}):Play()
-			tweenService:Create(knob, TweenInfo.new(Theme.HoverAnimationSpeed), {
+			TweenService:Create(knob, TweenInfo.new(Theme.HoverAnimationSpeed), {
 				Size = UDim2.new(0, Responsive.getSizes().sliderKnobSize, 0, Responsive.getSizes().sliderKnobSize)
 			}):Play()
 		end
@@ -867,11 +937,11 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = false
 			-- Animate back to normal state
-			tweenService:Create(sliderStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+			TweenService:Create(sliderStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 				Color = Theme.BorderColor,
 				Transparency = 0.6
 			}):Play()
-			tweenService:Create(knob, TweenInfo.new(Theme.HoverAnimationSpeed), {
+			TweenService:Create(knob, TweenInfo.new(Theme.HoverAnimationSpeed), {
 				Size = UDim2.new(0, Responsive.getSizes().sliderKnobSize, 0, Responsive.getSizes().sliderKnobSize)
 			}):Play()
 		end
@@ -893,14 +963,14 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 			if num >= min and num <= max then
 				-- Valid input - success state
 				setValue(math.clamp(num, min, max), true)
-				tweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+				TweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 					Color = Theme.Success,
 					Transparency = 0.3
 				}):Play()
 			else
 				-- Invalid range - error state
 				setValue(value, false)
-				tweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+				TweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 					Color = Theme.Danger,
 					Transparency = 0.3
 				}):Play()
@@ -918,7 +988,7 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 				validationLabel.Parent = container
 
 				-- Fade out after 2 seconds
-				local fadeTween = tweenService:Create(validationLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 1.5), {
+				local fadeTween = TweenService:Create(validationLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 1.5), {
 					TextTransparency = 1
 				})
 				fadeTween:Play()
@@ -929,7 +999,7 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 		else
 			-- Invalid input - error state
 			setValue(value, false)
-			tweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+			TweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 				Color = Theme.Danger,
 				Transparency = 0.3
 			}):Play()
@@ -948,7 +1018,7 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 			validationLabel.Parent = container
 
 			-- Fade out after 2 seconds
-			local fadeTween = tweenService:Create(validationLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 1.5), {
+			local fadeTween = TweenService:Create(validationLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 1.5), {
 				TextTransparency = 1
 			})
 			fadeTween:Play()
@@ -959,7 +1029,7 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 
 		-- Animate back to normal state after delay
 		wait(2)
-		tweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+		TweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 			Color = Theme.BorderColor,
 			Transparency = 0.6
 		}):Play()
@@ -967,7 +1037,7 @@ local function createModernSlider(parent, text, min, max, default, decimals)
 
 	valueBox.Focused:Connect(function()
 		-- Animate to focused state
-		tweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
+		TweenService:Create(valueBoxStroke, TweenInfo.new(Theme.HoverAnimationSpeed), {
 			Color = Theme.Primary,
 			Transparency = 0.3
 		}):Play()
@@ -1425,90 +1495,6 @@ local function createProgressBar(parent)
 	return updateProgress, hide
 end
 
-local function createLoadingSpinner(parent, size)
-	local container = Instance.new("Frame")
-	container.Size = UDim2.new(0, size or 24, 0, size or 24)
-	container.BackgroundTransparency = 1
-	container.Parent = parent
-
-	local spinner = Instance.new("Frame")
-	spinner.Size = UDim2.new(1, 0, 1, 0)
-	spinner.BackgroundTransparency = 1
-	spinner.Parent = container
-
-	-- Create spinner segments
-	local segments = {}
-	for i = 1, 8 do
-		local segment = Instance.new("Frame")
-		segment.Size = UDim2.new(0.15, 0, 0.15, 0)
-		segment.Position = UDim2.new(0.5, 0, 0.1, 0)
-		segment.AnchorPoint = Vector2.new(0.5, 0.5)
-		segment.BackgroundColor3 = Theme.Primary
-		segment.BackgroundTransparency = 1 - (i / 8)
-		segment.BorderSizePixel = 0
-		segment.Parent = spinner
-
-		local rotation = i * 45
-		local angle = math.rad(rotation)
-		local radius = (size or 24) * 0.35
-		segment.Position = UDim2.new(0.5 + math.sin(angle) * 0.35, 0, 0.5 - math.cos(angle) * 0.35, 0)
-		segment.Rotation = rotation
-
-		table.insert(segments, segment)
-	end
-
-	-- Animate rotation
-	local function startSpinAnimation()
-		local spinTween = TweenService:Create(spinner, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1), {
-			Rotation = 360
-		})
-		spinTween:Play()
-		return spinTween
-	end
-
-	-- Animate segment opacity
-	local function startSegmentAnimation()
-		for i, segment in ipairs(segments) do
-			local delay = (i - 1) * 0.1
-			local function animateSegment()
-				local fadeTween = TweenService:Create(segment, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-					BackgroundTransparency = 0.8
-				})
-				fadeTween:Play()
-				fadeTween.Completed:Connect(function()
-					local showTween = TweenService:Create(segment, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-						BackgroundTransparency = 0.2
-					})
-					showTween:Play()
-				end)
-			end
-
-			-- Start animation with delay
-			local connection
-			connection = game:GetService("RunService").Heartbeat:Connect(function()
-				connection:Disconnect()
-				animateSegment()
-			end)
-		end
-	end
-
-	local spinTween = startSpinAnimation()
-	startSegmentAnimation()
-
-	local function show()
-		container.Visible = true
-	end
-
-	local function hide()
-		container.Visible = false
-		if spinTween then
-			spinTween:Cancel()
-		end
-	end
-
-	return show, hide
-end
-
 -- [[!]] FUNGSI BARU createTerrainSelector
 local function createTerrainSelector(parent)
 	local container = Instance.new("Frame")
@@ -1964,6 +1950,8 @@ local function switchTab(tabToActivate)
 	activeTab = tabToActivate
 end
 
+local tweenService = game:GetService("TweenService")
+
 local function createModernTab(name, icon)
 	-- Modern tab button with glass design and icons
 	local button = Instance.new("TextButton")
@@ -2019,7 +2007,34 @@ local function createModernTab(name, icon)
 	textLabel.TextColor3 = Theme.TextMuted
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.Parent = contentFrame
+	
+	-- Modern content container
+	local content = Instance.new("ScrollingFrame")
+	content.Size = UDim2.new(1, -20, 1, -20)
+	content.Position = UDim2.new(0, Responsive.getSizes().contentPadding, 0, Responsive.getSizes().contentPadding)
+	content.BackgroundTransparency = 1
+	content.ScrollBarThickness = Responsive.getSizes().scrollBarThickness
+	content.ScrollBarImageColor3 = Theme.Primary
+	content.Visible = false
+	content.Parent = contentContainer
 
+	-- Content layout with proper spacing
+	local layout = Instance.new("UIListLayout")
+	layout.Padding = Theme.PaddingLarge
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+	layout.Parent = content
+
+	-- Padding for content
+	local padding = Instance.new("UIPadding")
+	padding.PaddingTop = Theme.PaddingMedium
+	padding.PaddingBottom = Theme.PaddingMedium
+	padding.PaddingLeft = Theme.PaddingMedium
+	padding.PaddingRight = Theme.PaddingMedium
+	padding.Parent = content
+	
+	local tabData
+	tabData = {button = button, content = content, isActive = false}
+	tabs[name] = tabData
 	-- Hover animations
 	button.MouseEnter:Connect(function()
 		game:GetService("TweenService"):Create(button, TweenInfo.new(Theme.HoverAnimationSpeed), {
@@ -2053,32 +2068,7 @@ local function createModernTab(name, icon)
 		end
 	end)
 
-	-- Modern content container
-	local content = Instance.new("ScrollingFrame")
-	content.Size = UDim2.new(1, -20, 1, -20)
-	content.Position = UDim2.new(0, Responsive.getSizes().contentPadding, 0, Responsive.getSizes().contentPadding)
-	content.BackgroundTransparency = 1
-	content.ScrollBarThickness = Responsive.getSizes().scrollBarThickness
-	content.ScrollBarImageColor3 = Theme.Primary
-	content.Visible = false
-	content.Parent = contentContainer
-
-	-- Content layout with proper spacing
-	local layout = Instance.new("UIListLayout")
-	layout.Padding = Theme.PaddingLarge
-	layout.SortOrder = Enum.SortOrder.LayoutOrder
-	layout.Parent = content
-
-	-- Padding for content
-	local padding = Instance.new("UIPadding")
-	padding.PaddingTop = Theme.PaddingMedium
-	padding.PaddingBottom = Theme.PaddingMedium
-	padding.PaddingLeft = Theme.PaddingMedium
-	padding.PaddingRight = Theme.PaddingMedium
-	padding.Parent = content
-
-	local tabData = {button = button, content = content, isActive = false}
-	tabs[name] = tabData
+	
 
 	button.MouseButton1Click:Connect(function()
 		switchTab(tabData)
@@ -2114,7 +2104,7 @@ targetTerrainLabel.Parent = terrainCard
 
 local getTargetTerrain, updateTargetTerrainUI = createTerrainSelector(terrainCard)
 getTargetTerrain().LayoutOrder = 2
-
+local sizeXInput, sizeZInput, seedInput
 -- Function to find all terrain objects in workspace
 local function findAndupdateTerrainObjects()
 	local terrainObjects = {}
@@ -2155,7 +2145,7 @@ sizeXLabel.TextSize = Responsive.getSizes().bodyFontSize
 sizeXLabel.LayoutOrder = 1
 sizeXLabel.Parent = worldSettingsCard
 
-sizeXInput = Instance.new("TextBox")
+local sizeXInput = Instance.new("TextBox")
 sizeXInput.Size = UDim2.new(1, 0, 0, Responsive.getSizes().inputHeight)
 sizeXInput.Text = "256"
 sizeXInput.BackgroundColor3 = Theme.InputBackground
@@ -2263,7 +2253,7 @@ sizeZLabel.TextSize = Responsive.getSizes().bodyFontSize
 sizeZLabel.LayoutOrder = 3
 sizeZLabel.Parent = worldSettingsCard
 
-sizeZInput = Instance.new("TextBox")
+local sizeZInput = Instance.new("TextBox")
 sizeZInput.Size = UDim2.new(1, 0, 0, Responsive.getSizes().inputHeight)
 sizeZInput.Text = "256"
 sizeZInput.BackgroundColor3 = Theme.InputBackground
@@ -2371,7 +2361,7 @@ seedLabel.TextSize = Responsive.getSizes().bodyFontSize
 seedLabel.LayoutOrder = 5
 seedLabel.Parent = worldSettingsCard
 
-seedInput = Instance.new("TextBox")
+local seedInput = Instance.new("TextBox")
 seedInput.Size = UDim2.new(1, 0, 0, Responsive.getSizes().inputHeight)
 seedInput.Text = "0"
 seedInput.BackgroundColor3 = Theme.InputBackground
@@ -2419,7 +2409,6 @@ end)
 
 -- Hover effects for seedInput
 seedInput.MouseEnter:Connect(function()
-	local tweenService = game:GetService("TweenService")
 	local tweenInfo = TweenInfo.new(Theme.HoverAnimationSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
 	-- Scale up slightly
@@ -2656,39 +2645,39 @@ updateBiomeControls = function()
 		ruleLabel.Parent = dynamicControlsContainer
 
 		if rule.minAltitude then
-			local getter, setter = createSlider(dynamicControlsContainer, "Min Altitude", 0, 250, rule.minAltitude)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Min Altitude", 0, 250, rule.minAltitude)
 			activeBiomeControlGetters[i .. "_minAltitude"] = {get=getter, set=setter}
 		end
 		if rule.maxAltitude then
-			local getter, setter = createSlider(dynamicControlsContainer, "Max Altitude", 0, 250, rule.maxAltitude)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Max Altitude", 0, 250, rule.maxAltitude)
 			activeBiomeControlGetters[i .. "_maxAltitude"] = {get=getter, set=setter}
 		end
 		if rule.minSteepness then
-			local getter, setter = createSlider(dynamicControlsContainer, "Min Steepness", 0, 90, rule.minSteepness)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Min Steepness", 0, 90, rule.minSteepness)
 			activeBiomeControlGetters[i .. "_minSteepness"] = {get=getter, set=setter}
 		end
 		if rule.maxSteepness then
-			local getter, setter = createSlider(dynamicControlsContainer, "Max Steepness", 0, 90, rule.maxSteepness)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Max Steepness", 0, 90, rule.maxSteepness)
 			activeBiomeControlGetters[i .. "_maxSteepness"] = {get=getter, set=setter}
 		end
 		if rule.nearWater then
-			local getter, setter = createSlider(dynamicControlsContainer, "Max Water Distance", 1, 50, rule.nearWater.maxDistance)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Max Water Distance", 1, 50, rule.nearWater.maxDistance)
 			activeBiomeControlGetters[i .. "_nearWater_maxDistance"] = {get=getter, set=setter}
 		end
 		if rule.minTemperature then
-			local getter, setter = createSlider(dynamicControlsContainer, "Min Temperature", 0, 100, rule.minTemperature)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Min Temperature", 0, 100, rule.minTemperature)
 			activeBiomeControlGetters[i .. "_minTemperature"] = {get=getter, set=setter}
 		end
 		if rule.maxTemperature then
-			local getter, setter = createSlider(dynamicControlsContainer, "Max Temperature", 0, 100, rule.maxTemperature)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Max Temperature", 0, 100, rule.maxTemperature)
 			activeBiomeControlGetters[i .. "_maxTemperature"] = {get=getter, set=setter}
 		end
 		if rule.minHumidity then
-			local getter, setter = createSlider(dynamicControlsContainer, "Min Humidity", 0, 100, rule.minHumidity)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Min Humidity", 0, 100, rule.minHumidity)
 			activeBiomeControlGetters[i .. "_minHumidity"] = {get=getter, set=setter}
 		end
 		if rule.maxHumidity then
-			local getter, setter = createSlider(dynamicControlsContainer, "Max Humidity", 0, 100, rule.maxHumidity)
+			local getter, setter = createModernSlider(dynamicControlsContainer, "Max Humidity", 0, 100, rule.maxHumidity)
 			activeBiomeControlGetters[i .. "_maxHumidity"] = {get=getter, set=setter}
 		end
 	end
@@ -2708,12 +2697,12 @@ assetFolderLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 assetFolderLabel.TextXAlignment = Enum.TextXAlignment.Left
 assetFolderLabel.Parent = biomesContent
 
-assetFolderInput = Instance.new("TextBox")
+local assetFolderInput = Instance.new("TextBox")
 assetFolderInput.Size = UDim2.new(1, 0, 0, Responsive.getSizes().inputHeight)
 assetFolderInput.Text = "GeoCraftAssets"
 assetFolderInput.Parent = biomesContent
 
-local getForestDensity, setForestDensity = createSlider(biomesContent, "Forest Density", 0, 1, 0.5)
+local getForestDensity, setForestDensity = createModernSlider(biomesContent, "Forest Density", 0, 1, 0.5)
 
 -- Add UI elements for the Sculpt tab
 local activateSculptButton = Instance.new("TextButton")
@@ -2725,11 +2714,11 @@ activateSculptButton.Parent = sculptContent
 
 createSectionHeader(sculptContent, "Brush Settings")
 local getSculptMode, setSculptMode = createSegmentedControl(sculptContent, {"Raise", "Lower", "Erode", "Plant"})
-local getBrushSize, setBrushSize = createSlider(sculptContent, "Brush Size", 5, 100, 20)
-local getBrushStrength, setBrushStrength = createSlider(sculptContent, "Brush Strength / Density", 1, 20, 5)
+local getBrushSize, setBrushSize = createModernSlider(sculptContent, "Brush Size", 5, 100, 20)
+local getBrushStrength, setBrushStrength = createModernSlider(sculptContent, "Brush Strength / Density", 1, 20, 5)
 
 createSectionHeader(sculptContent, "Erosion Brush")
-local getErosionDroplets, setErosionDroplets = createSlider(sculptContent, "Erosion Droplets", 1000, 50000, 5000)
+local getErosionDroplets, setErosionDroplets = createModernSlider(sculptContent, "Erosion Droplets", 1000, 50000, 5000)
 
 -- Require the modules
 local TerrainGenerator = require(script:WaitForChild("TerrainGenerator"))
@@ -2824,7 +2813,7 @@ generateButton.MouseButton1Click:Connect(function()
 	generateButton.Active = false
 
 	-- Add loading spinner to button
-	local spinnerShow, spinnerHide = createLoadingSpinner(generateButton, 16)
+	local spinnerShow, spinnerHide = createLoadingSpinner(generateButton, 16, Theme, Responsive)
 	spinnerShow()
 
 	-- Wrap generation in pcall for error handling
